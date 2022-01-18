@@ -1,4 +1,5 @@
 const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 exports.user_get = (req, res) => {
@@ -8,7 +9,7 @@ exports.user_get = (req, res) => {
 };
 
 exports.signin_get = (req, res) => {
-  
+
 };
 
 // signin_post here
