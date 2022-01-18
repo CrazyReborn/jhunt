@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
+
 require('dotenv').config();
 
 const indexRouter = require('./routes/index');
@@ -11,7 +12,7 @@ const usersRouter = require('./routes/users');
 
 const app = express();
 
-mongoose.connect(process.env.MONGO_DB, { useNewUrlParser: true, useUnifiendTopology: true });
+mongoose.connect(process.env.MONGO_DB, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error'));
 
@@ -25,4 +26,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+app.get('/', (req, res) => {
+  res.send(req.oidc.isAuthenticated() ? 'Logged In' : 'Logged Out');
+});
+
+app.listen(5000);
 module.exports = app;

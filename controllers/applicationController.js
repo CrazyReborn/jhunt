@@ -15,5 +15,4 @@ exports.applications_post = [
   body('location', 'Location should not be empty').trim().isLength({ min: 1 }).escape(),
   body('aggregator', 'Aggregator field should not be empty').trim().isLength({ min: 1 }).escape(),
   body('link', 'Link field should not be empty').trim().isLength({ min: 1 }).escape(),
-  
-]
+];
