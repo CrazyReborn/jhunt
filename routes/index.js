@@ -1,12 +1,13 @@
 const express = require('express');
-const userController = require('../controllers/user');
+const userController = require('../controllers/userController');
+const applicationController = require('../controllers/applicationController');
 // const user_controller = require('../controllers/user');
 
 const router = express.Router();
 
-// /* GET home page. */
-// router.get('/api/v1/applications', application_controller.applications_get);
-// router.post('/api/v1/applications', application_controller.applications_post);
+/* GET home page. */
+router.get('/api/v1/applications', applicationController.applications_get);
+router.post('/api/v1/applications', applicationController.applications_post);
 
 router.get('/api/v1/signin', userController.signin_get);
 router.post('/api/v1/signin', userController.signin_post);
