@@ -1,5 +1,6 @@
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 exports.user_get = (req, res) => {
@@ -9,10 +10,36 @@ exports.user_get = (req, res) => {
 };
 
 exports.signin_get = (req, res) => {
-
+  res.send('success');
 };
 
 // signin_post here
+exports.signin_post = [
+  body('username', 'Username field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('password', 'Password field should not be empty').trim().isLength({ min: 1 }).escape(),
+  (req, res) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.json({ err: errors });
+    } else {
+      User.findOne({ username: req.body.username }, (err, user) => {
+        if (err) {
+          res.json({ err });
+        } else if (user === null) {
+          res.json({ err: 'Wrong username' });
+        } else {
+          bcrypt.compare(req.body.password, user.password)
+            .then(() => {
+              const token = jwt.sign({ user }, 'secretKey');
+              res.json({ token });
+            })
+            .catch(() => res.json({ err: 'Wrong password' }));
+        }
+      });
+    }
+  },
+];
 
 exports.signup_get = (req, res) => {
   res.send('success');

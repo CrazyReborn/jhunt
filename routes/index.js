@@ -9,6 +9,7 @@ const router = express.Router();
 // router.post('/api/v1/applications', application_controller.applications_post);
 
 router.get('/api/v1/signin', userController.signin_get);
+router.post('/api/v1/signin', userController.signin_post);
 
 router.get('/api/v1/signup', userController.signup_get);
 router.post('/api/v1/signup', userController.signup_post);
