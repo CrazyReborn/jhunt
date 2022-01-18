@@ -21,7 +21,37 @@ exports.signup_get = (req, res) => {
 exports.signup_post = [
   body('username', 'Username field should not be empty').trim().isLength({ min: 1 }).escape(),
   body('password', 'Password field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('confirm-password').trim().isLength({ min: 1 }).escape()
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Passwords do not match');
+      }
+      return true;
+    }),
   (req, res) => {
-    res.send('success');
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.json({ err: errors });
+    } else {
+      bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
+        if (err) {
+          res.json({ err });
+        } else {
+          const user = new User({
+            username: req.body.username,
+            password: hashedPassword,
+            applications: [],
+          });
+          user.save((savingErr) => {
+            if (err) {
+              res.json({ err: savingErr });
+            } else {
+              res.send('success');
+            }
+          });
+        }
+      });
+    }
   },
 ];
