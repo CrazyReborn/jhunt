@@ -9,6 +9,9 @@ const router = express.Router();
 router.get('/api/v1/applications', applicationController.applications_get);
 router.post('/api/v1/applications', applicationController.applications_post);
 
+router.get('/api/v1/applications/:id', applicationController.application_get);
+router.put('/api/v1/applications/:id', applicationController.application_put);
+
 router.get('/api/v1/signin', userController.signin_get);
 router.post('/api/v1/signin', userController.signin_post);
 

@@ -70,3 +70,9 @@ exports.applications_post = [
     }
   },
 ];
+
+exports.application_get = (req, res) => {
+  Application.findById(req.params.id)
+    .then((application) => res.json(application))
+    .catch((err) => res.json({ err }));
+};
