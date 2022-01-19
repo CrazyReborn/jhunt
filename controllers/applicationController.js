@@ -114,9 +114,9 @@ exports.application_put = [
         if (err) {
           res.json({ err });
         } else {
-          Application.findByIdAndUpdate(req.params.id, application, (err) => {
-            if (err) {
-              res.json({ err });
+          Application.findByIdAndUpdate(req.params.id, application, (savingErr) => {
+            if (savingErr) {
+              res.json({ err: savingErr });
             } else {
               res.send('succsess');
             }
@@ -124,5 +124,14 @@ exports.application_put = [
         }
       });
     }
+  },
+];
+
+exports.application_delete = [
+  verifyToken,
+  (req, res) => {
+    Application.findByIdAndRemove(req.params.id)
+      .then(() => res.send('success'))
+      .catch((err) => res.json({ err }));
   },
 ];
