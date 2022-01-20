@@ -1,7 +1,7 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const applicationController = require('../controllers/applicationController');
-// const user_controller = require('../controllers/user');
+const interviewController = require('../controllers/interviewController');
 
 const router = express.Router();
 
@@ -11,6 +11,12 @@ router.post('/api/v1/applications', applicationController.applications_post);
 
 router.get('/api/v1/applications/:id', applicationController.application_get);
 router.put('/api/v1/applications/:id', applicationController.application_put);
+router.delete('/api/v1/applications/:id', applicationController.application_delete);
+
+router.get('/api/v1/interviews', interviewController.interviews_get);
+router.post('/api/v1/interviews', interviewController.interviews_post);
+router.put('/api/v1/interviews/:id', interviewController.interview_put);
+router.delete('/api/v1/interviews/:id', interviewController.interview_delete);
 
 router.get('/api/v1/signin', userController.signin_get);
 router.post('/api/v1/signin', userController.signin_post);
