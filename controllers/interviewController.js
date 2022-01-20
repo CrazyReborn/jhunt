@@ -125,3 +125,22 @@ exports.interview_put = [
     }
   },
 ];
+
+exports.interview_delete = [
+  verifyToken,
+  (req, res) => {
+    jwt.verify(req.token, 'secretKey', (err) => {
+      if (err) {
+        res.json({ err });
+      } else {
+        Interview.findByIdAndRemove(req.params.id).exec((savingErr) => {
+          if (savingErr) {
+            res.json({ err: savingErr });
+          } else {
+            res.send('success');
+          }
+        });
+      }
+    });
+  },
+];
