@@ -38,6 +38,40 @@ exports.interviews_get = [
   },
 ];
 
+exports.interviews_post = [
+  body('date', 'Date field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('length').trim().isLength({ min: 1 }).escape(),
+  body('rate').trim().isLength({ min: 1 }).escape(),
+  verifyToken,
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.json({ err: errors });
+    } else {
+      jwt.verify(req.token, 'secretKey', (tokenErr) => {
+        if (tokenErr) {
+          res.json({ err: tokenErr });
+        } else {
+          const interview = new Interview({
+            date: req.body.date,
+            application: req.body.application,
+            length: req.body.length,
+            status: req.body.status,
+            rate: req.body.rate,
+          });
+          interview.save().exec((err) => {
+            if (err) {
+              res.json({ err });
+            } else {
+              res.send('success');
+            }
+          });
+        }
+      });
+    }
+  },
+];
+
 exports.inteview_get = [
   verifyToken,
   (req, res) => {
@@ -66,7 +100,7 @@ exports.interview_put = [
     if (!errors.isEmpty()) {
       res.json({ err: errors });
     } else {
-      jwt.verify(req.body, 'secretKey', (tokenErr) => {
+      jwt.verify(req.token, 'secretKey', (tokenErr) => {
         if (tokenErr) {
           res.json({ err: tokenErr });
         } else {
