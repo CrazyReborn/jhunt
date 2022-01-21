@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const InterviewSchema = new Schema({
+  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   date: { type: Date, required: true },
   application: { type: Schema.Types.ObjectId, ref: 'Application', required: true },
   length: { type: Number },

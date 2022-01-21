@@ -53,6 +53,7 @@ exports.interviews_post = [
           res.json({ err: tokenErr });
         } else {
           const interview = new Interview({
+            user: req.userId,
             date: req.body.date,
             application: req.body.application,
             length: req.body.length,
@@ -106,6 +107,7 @@ exports.interview_put = [
         } else {
           const interview = new Interview({
             _id: req.params.id,
+            user: req.userId,
             date: req.body.date,
             application: req.body.application,
             length: req.body.length,

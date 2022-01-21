@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -22,6 +23,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+// app.use(session({
+//   secret: process.env.EXPRESS_SECRET,
+//   saveUninitialized: true,
+//   // 24 hours
+//   cookie: { maxAge: 1000 * 60 * 60 * 24 },
+//   resave: false,
+// }));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
