@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const EventSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  job: { type: Schema.Types.ObjectId, ref: 'Application', required: true },
+  application: { type: Schema.Types.ObjectId, ref: 'Application', required: true },
   date: { type: Date },
   interview: { type: Schema.Types.ObjectId, ref: 'Interview', required: false },
 });

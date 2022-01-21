@@ -24,13 +24,14 @@ exports.events_get = [
       if (err) {
         res.json({ err });
       } else {
-        Event.find().exec((findingErr, events) => {
-          if (findingErr) {
-            res.json({ err: findingErr });
-          } else {
-            res.json({ events });
-          }
-        });
+        Event.find().populate('user').populate('applicatoin').populate('interview')
+          .exec((findingErr, events) => {
+            if (findingErr) {
+              res.json({ err: findingErr });
+            } else {
+              res.json({ events });
+            }
+          });
       }
     });
   },
@@ -71,7 +72,7 @@ exports.event_new_post = [
       } else {
         const event = new Event({
           user: req.userId,
-          job: req.body.job,
+          application: req.body.application,
           date: req.body.date,
           interview: req.body.interview,
         });
@@ -97,7 +98,7 @@ exports.event_put = [
         const event = new Event({
           _id: req.params.id,
           user: req.userId,
-          job: req.body.job,
+          application: req.body.application,
           date: req.body.date,
           interview: req.body.interview,
         });
