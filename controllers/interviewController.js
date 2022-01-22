@@ -3,11 +3,8 @@ const jwt = require('jsonwebtoken');
 const Interview = require('../models/interview');
 
 const verifyToken = (req, res, next) => {
-  const bearerHeader = req.headers.authorization;
-  if (typeof bearerHeader !== 'undefined') {
-    const bearer = bearerHeader.split(' ');
-    const bearerToken = bearer[1];
-    req.token = bearerToken;
+  const { cookies } = req;
+  if ('token' in cookies) {
     next();
   } else {
     res.sendStatus(403);
@@ -21,11 +18,13 @@ exports.interviews_get = [
     if (!errors.isEmpty()) {
       res.json({ err: errors });
     } else {
-      jwt.verify(req.token, 'secretKey', (err) => {
+      const { cookies } = req;
+      jwt.verify(cookies.token, 'secretKey', (err, authData) => {
         if (err) {
           res.json({ err });
         } else {
-          Interview.find().exec((findingErr, interviews) => {
+          const { user } = authData;
+          Interview.find({ user: user._id }, (findingErr, interviews) => {
             if (err) {
               res.json({ err: findingErr });
             } else {
@@ -48,19 +47,21 @@ exports.interviews_post = [
     if (!errors.isEmpty()) {
       res.json({ err: errors });
     } else {
-      jwt.verify(req.token, 'secretKey', (tokenErr) => {
+      const { cookies } = req;
+      jwt.verify(cookies.token, 'secretKey', (tokenErr, authData) => {
         if (tokenErr) {
           res.json({ err: tokenErr });
         } else {
+          const { user } = authData;
           const interview = new Interview({
-            user: req.userId,
+            user: user._id,
             date: req.body.date,
             application: req.body.application,
             length: req.body.length,
             status: req.body.status,
             rate: req.body.rate,
           });
-          interview.save().exec((err) => {
+          interview.save((err) => {
             if (err) {
               res.json({ err });
             } else {
@@ -76,7 +77,8 @@ exports.interviews_post = [
 exports.inteview_get = [
   verifyToken,
   (req, res) => {
-    jwt.verify(req.token, 'secretKey', (tokenErr) => {
+    const { cookies } = req;
+    jwt.verify(cookies.token, 'secretKey', (tokenErr) => {
       if (tokenErr) {
         res.json({ err: tokenErr });
       } else {
@@ -101,12 +103,14 @@ exports.interview_put = [
     if (!errors.isEmpty()) {
       res.json({ err: errors });
     } else {
-      jwt.verify(req.token, 'secretKey', (tokenErr) => {
+      const { cookies } = req;
+      jwt.verify(cookies.token, 'secretKey', (tokenErr, authData) => {
         if (tokenErr) {
           res.json({ err: tokenErr });
         } else {
+          const { user } = authData;
           const interview = new Interview({
-            _id: req.params.id,
+            _id: user._id,
             user: req.userId,
             date: req.body.date,
             application: req.body.application,
@@ -131,7 +135,8 @@ exports.interview_put = [
 exports.interview_delete = [
   verifyToken,
   (req, res) => {
-    jwt.verify(req.token, 'secretKey', (err) => {
+    const { cookies } = req;
+    jwt.verify(cookies.token, 'secretKey', (err) => {
       if (err) {
         res.json({ err });
       } else {

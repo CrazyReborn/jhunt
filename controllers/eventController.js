@@ -1,4 +1,3 @@
-const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const async = require('async');
 const Event = require('../models/event');
