@@ -2,15 +2,6 @@ const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const Application = require('../models/application');
 
-const verifyToken = (req, res, next) => {
-  const { cookies } = req;
-  if ('token' in cookies) {
-    next();
-  } else {
-    res.sendStatus(403);
-  }
-};
-
 exports.applications_get = [
   verifyToken,
   (req, res) => {
@@ -81,7 +72,7 @@ exports.application_get = [
   verifyToken,
   (req, res) => { // Add jwt.verify function
     Application.findById(req.params.id)
-      .then((application) => res.json(application))
+      .then((application) => res.json({ application }))
       .catch((err) => res.json({ err }));
   },
 ];

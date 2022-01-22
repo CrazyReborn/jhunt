@@ -6,11 +6,8 @@ const Application = require('../models/application');
 const Interview = require('../models/interview');
 
 const verifyToken = (req, res, next) => {
-  const bearerHeader = req.headers.authorization;
-  if (typeof bearerHeader !== 'undefined') {
-    const bearer = bearerHeader.split(' ');
-    const bearerToken = bearer[1];
-    req.token = bearerToken;
+  const { cookies } = req;
+  if ('token' in cookies) {
     next();
   } else {
     res.sendStatus(403);
@@ -20,11 +17,13 @@ const verifyToken = (req, res, next) => {
 exports.events_get = [
   verifyToken,
   (req, res) => {
-    jwt.verify(req.token, 'secretKey', (err) => {
+    const { cookies } = req;
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
       if (err) {
         res.json({ err });
       } else {
-        Event.find().populate('user').populate('applicatoin').populate('interview')
+        const { user } = authData;
+        Event.find({ user: user._id }).populate('user').populate('applicatoin').populate('interview')
           .exec((findingErr, events) => {
             if (findingErr) {
               res.json({ err: findingErr });
@@ -41,17 +40,18 @@ exports.event_new_get = [
   verifyToken,
   (req, res) => {
     async.parallel({
-      applications: function (callback) {
+      applications(callback) {
         Application.find({ user: req.userId}).exec(callback);
       },
-      interviews: function(callback) {
+      interviews(callback) {
         Interview.find({ user: req.userId }).exec(callback);
       },
     }, (err, results) => {
       if (err) {
         res.json({ err });
       } else {
-        jwt.verify(req.token, 'secretKey', (tokenErr) => {
+        const { cookies } = req;
+        jwt.verify(cookies.token, 'secretKey', (tokenErr) => {
           if (tokenErr) {
             res.json({ err: tokenErr });
           } else {
@@ -66,12 +66,14 @@ exports.event_new_get = [
 exports.event_new_post = [
   verifyToken,
   (req, res) => {
-    jwt.verify(req.token, 'secretKey', (err) => {
+    const { cookies } = req;
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
       if (err) {
         res.json({ err });
       } else {
+        const { user } = authData;
         const event = new Event({
-          user: req.userId,
+          user: user._id,
           application: req.body.application,
           date: req.body.date,
           interview: req.body.interview,
@@ -91,13 +93,15 @@ exports.event_new_post = [
 exports.event_put = [
   verifyToken,
   (req, res) => {
-    jwt.verify(req.token, 'secretKey', (err) => {
+    const { cookies } = req;
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
       if (err) {
         res.json({ err });
       } else {
+        const { user } = authData;
         const event = new Event({
           _id: req.params.id,
-          user: req.userId,
+          user: user._id,
           application: req.body.application,
           date: req.body.date,
           interview: req.body.interview,
@@ -117,7 +121,8 @@ exports.event_put = [
 exports.event_delete = [
   verifyToken,
   (req, res) => {
-    jwt.verify(req.token, 'secretKey', (err) => {
+    const { cookies } = req;
+    jwt.verify(cookies.token, 'secretKey', (err) => {
       if (err) {
         res.json({ err });
       } else {
