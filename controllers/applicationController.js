@@ -3,11 +3,8 @@ const jwt = require('jsonwebtoken');
 const Application = require('../models/application');
 
 const verifyToken = (req, res, next) => {
-  const bearerHeader = req.headers.authorization;
-  if (typeof bearerHeader !== 'undefined') {
-    const bearer = bearerHeader.split(' ');
-    const bearerToken = bearer[1];
-    req.token = bearerToken;
+  const { cookies } = req;
+  if ('token' in cookies) {
     next();
   } else {
     res.sendStatus(403);
@@ -17,10 +14,17 @@ const verifyToken = (req, res, next) => {
 exports.applications_get = [
   verifyToken,
   (req, res) => {
-    const { userId } = req.userId;
-    Application.find({ user: userId })
-      .then((applications) => res.json({ applications }))
-      .catch((err) => res.json({ err }));
+    const { cookies } = req;
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
+      if (err) {
+        res.json({ err });
+      } else {
+        const { user } = authData;
+        Application.find({ user: user._id })
+          .then((applications) => res.json({ applications }))
+          .catch((userErr) => res.json({ err: userErr }));
+      }
+    });
   },
 ];
 
@@ -39,25 +43,27 @@ exports.applications_post = [
     if (!errors.isEmpty()) {
       res.json({ err: errors });
     } else {
-      const application = new Application({
-        user: req.body.userId,
-        company_name: req.body.companyName,
-        position: req.body.position,
-        salary: req.body.salary,
-        status: req.body.status,
-        location: req.body.location,
-        aggregator: req.body.aggregator,
-        found_on: req.body.foundOn,
-        cv_sent_on: req.body.cvSentOn,
-        cv_path: '',
-        job_link: req.body.link,
-        answer_received: req.body.answerReceived,
-        qualifications_met: req.body.qualifications,
-      });
-      jwt.verify(req.token, 'secretKey', (err) => {
+      const { cookies } = req;
+      jwt.verify(cookies.token, 'secretKey', (err, authData) => {
         if (err) {
           res.json({ err });
         } else {
+          const { user } = authData;
+          const application = new Application({
+            user: user._id,
+            company_name: req.body.companyName,
+            position: req.body.position,
+            salary: req.body.salary,
+            status: req.body.status,
+            location: req.body.location,
+            aggregator: req.body.aggregator,
+            found_on: req.body.foundOn,
+            cv_sent_on: req.body.cvSentOn,
+            cv_path: '',
+            job_link: req.body.link,
+            answer_received: req.body.answerReceived,
+            qualifications_met: req.body.qualifications,
+          });
           application.save((savingErr) => {
             if (savingErr) {
               res.json({ err: savingErr });
@@ -130,8 +136,15 @@ exports.application_put = [
 exports.application_delete = [
   verifyToken,
   (req, res) => {
-    Application.findByIdAndRemove(req.params.id)
-      .then(() => res.send('success'))
-      .catch((err) => res.json({ err }));
+    const { cookies } = req;
+    jwt.verify(cookies.token, 'secretKey', (err) => {
+      if (err) {
+        res.json({ err });
+      } else {
+        Application.findByIdAndRemove(req.params.id)
+          .then(() => res.send('success'))
+          .catch((delErr) => res.json({ err: delErr }));
+      }
+    });
   },
 ];

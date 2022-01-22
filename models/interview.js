@@ -16,4 +16,4 @@ const InterviewSchema = new Schema({
   rate: { type: Number, min: 0, max: 10 },
 });
 
-module.exports = mongoose.module('Interview', InterviewSchema);
+module.exports = mongoose.model('Interview', InterviewSchema);

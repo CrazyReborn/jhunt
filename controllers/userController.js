@@ -32,9 +32,9 @@ exports.signin_post = [
           bcrypt.compare(req.body.password, user.password)
             .then(() => {
               const token = jwt.sign({ user }, 'secretKey');
-              res.status(200).cookie('token', token, {
+              res.cookie('token', token, {
                 httpOnly: true,
-              });
+              }).send('success');
             })
             .catch(() => res.json({ err: 'Wrong password' }));
         }
