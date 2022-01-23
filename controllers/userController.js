@@ -84,3 +84,7 @@ exports.signup_post = [
     }
   },
 ];
+
+exports.logout_post = (req, res) => {
+  res.clearCookie('token').send('success');
+};
