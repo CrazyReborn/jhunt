@@ -31,7 +31,7 @@ router.get('/api/v1/signin', userController.signin_get);
 router.post('/api/v1/signin', userController.signin_post);
 router.get('/api/v1/signup', userController.signup_get);
 router.post('/api/v1/signup', userController.signup_post);
-router.post('/api/v1/logout', userController.logout_post);
+router.post('/api/v1/signout', userController.logout_post);
 router.get('/api/v1/users/:id', userController.user_get);
 
 module.exports = router;

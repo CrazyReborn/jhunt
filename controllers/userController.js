@@ -10,7 +10,7 @@ exports.user_get = (req, res) => {
 };
 
 exports.signin_get = (req, res) => {
-  res.send('success');
+  res.json({ msg: 'success' });
 };
 
 // signin_post here
@@ -34,7 +34,7 @@ exports.signin_post = [
               const token = jwt.sign({ user }, 'secretKey');
               res.cookie('token', token, {
                 httpOnly: true,
-              }).send('success');
+              }).json({ msg: 'success' });
             })
             .catch(() => res.json({ err: 'Wrong password' }));
         }
@@ -44,13 +44,13 @@ exports.signin_post = [
 ];
 
 exports.signup_get = (req, res) => {
-  res.send('success');
+  res.json({ msg: 'success' });
 };
 
 exports.signup_post = [
   body('username', 'Username field should not be empty').trim().isLength({ min: 1 }).escape(),
   body('password', 'Password field should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('confirm-password').trim().isLength({ min: 1 }).escape()
+  body('confirmPassword', 'Confirm password field should not be empty').trim().isLength({ min: 1 }).escape()
     .custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error('Passwords do not match');
@@ -70,13 +70,12 @@ exports.signup_post = [
           const user = new User({
             username: req.body.username,
             password: hashedPassword,
-            applications: [],
           });
           user.save((savingErr) => {
             if (err) {
               res.json({ err: savingErr });
             } else {
-              res.send('success');
+              res.json({ msg: 'success' });
             }
           });
         }
@@ -86,5 +85,5 @@ exports.signup_post = [
 ];
 
 exports.logout_post = (req, res) => {
-  res.clearCookie('token').send('success');
+  res.clearCookie('token').json({ msg: 'success' });
 };

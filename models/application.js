@@ -23,7 +23,7 @@ const ApplicationSchema = new Schema({
   qualifications_met: {
     type: String,
     required: true,
-    enum: ['Fully met', 'Most are met', 'Half are met', 'Most are unmet', 'Fully unmet'],
+    enum: ['Fully met', 'Mostly met', 'Half are met', 'Mostly unmet', 'Fully unmet'],
     default: 'Half are met',
   },
 });

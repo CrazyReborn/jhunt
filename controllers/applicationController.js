@@ -35,7 +35,7 @@ exports.applications_post = [
   body('salary', 'Salary should not be empty').trim().isLength({ min: 1 }).escape(),
   body('location', 'Location should not be empty').trim().isLength({ min: 1 }).escape(),
   body('aggregator', 'Aggregator field should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('link', 'Link field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('jobLink', 'Link field should not be empty').trim().isLength({ min: 1 }),
   verifyToken,
   (req, res) => {
     const errors = validationResult(req);
@@ -59,16 +59,16 @@ exports.applications_post = [
             aggregator: req.body.aggregator,
             found_on: req.body.foundOn,
             cv_sent_on: req.body.cvSentOn,
-            cv_path: '',
-            job_link: req.body.link,
+            cv_path: req.body.cvPath,
+            job_link: req.body.jobLink,
             answer_received: req.body.answerReceived,
-            qualifications_met: req.body.qualifications,
+            qualifications_met: req.body.qualificationsMet,
           });
           application.save((savingErr) => {
             if (savingErr) {
               res.json({ err: savingErr });
             } else {
-              res.send('success');
+              res.json({ msg: 'success' });
             }
           });
         }
@@ -116,7 +116,8 @@ exports.application_put = [
         answer_received: req.body.answerReceived,
         qualifications_met: req.body.qualifications,
       });
-      jwt.verify(req.token, 'secretKey', (err) => {
+      const { cookies } = req;
+      jwt.verify(cookies.token, 'secretKey', (err) => {
         if (err) {
           res.json({ err });
         } else {
@@ -142,7 +143,7 @@ exports.application_delete = [
         res.json({ err });
       } else {
         Application.findByIdAndRemove(req.params.id)
-          .then(() => res.send('success'))
+          .then(() => res.json({ msg: 'success' }))
           .catch((delErr) => res.json({ err: delErr }));
       }
     });
