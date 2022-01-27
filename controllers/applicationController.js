@@ -92,7 +92,7 @@ exports.application_put = [
   body('salary', 'Salary should not be empty').trim().isLength({ min: 1 }).escape(),
   body('location', 'Location should not be empty').trim().isLength({ min: 1 }).escape(),
   body('aggregator', 'Aggregator field should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('link', 'Link field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('jobLink', 'Link field should not be empty').trim().isLength({ min: 1 }).escape(),
   verifyToken,
   (req, res) => {
     const errors = validationResult(req);
@@ -125,7 +125,7 @@ exports.application_put = [
             if (savingErr) {
               res.json({ err: savingErr });
             } else {
-              res.send('succsess');
+              res.json({ msg: 'succsess' });
             }
           });
         }
