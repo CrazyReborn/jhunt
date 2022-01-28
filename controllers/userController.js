@@ -3,15 +3,34 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+const verifyToken = (req, res, next) => {
+  const { cookies } = req;
+  if ('token' in cookies) {
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+};
+
 exports.user_get = (req, res) => {
   User.findById(req.params.id)
     .then((user) => res.json({ user }))
     .catch((err) => res.json({ err }));
 };
 
-exports.signin_get = (req, res) => {
-  res.json({ msg: 'success' });
-};
+exports.signin_get = [
+  verifyToken,
+  (req, res) => {
+    const { cookies } = req;
+    jwt.verify(cookies.token, 'secretKey', (err) => {
+      if (err) {
+        res.sendStatus(403);
+      } else {
+        res.sendStatus(200);
+      }
+    });
+  },
+];
 
 // signin_post here
 exports.signin_post = [
