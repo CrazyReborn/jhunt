@@ -24,7 +24,7 @@ exports.interviews_get = [
           res.json({ err });
         } else {
           const { user } = authData;
-          Interview.find({ user: user._id }, (findingErr, interviews) => {
+          Interview.find({ user: user._id }).populate('application').exec((findingErr, interviews) => {
             if (err) {
               res.json({ err: findingErr });
             } else {
