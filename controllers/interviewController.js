@@ -65,7 +65,7 @@ exports.interviews_post = [
             if (err) {
               res.json({ err });
             } else {
-              res.send('success');
+              res.json({ msg: 'success' });
             }
           });
         }

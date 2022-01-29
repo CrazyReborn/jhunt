@@ -24,9 +24,9 @@ exports.signin_get = [
     const { cookies } = req;
     jwt.verify(cookies.token, 'secretKey', (err) => {
       if (err) {
-        res.sendStatus(403);
+        res.json({ err });
       } else {
-        res.sendStatus(200);
+        res.json({ msg: 'ok' });
       }
     });
   },
