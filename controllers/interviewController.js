@@ -1,4 +1,5 @@
 const { body, validationResult } = require('express-validator');
+const sanitizeHtml = require('sanitize-html');
 const jwt = require('jsonwebtoken');
 const Interview = require('../models/interview');
 
@@ -39,8 +40,6 @@ exports.interviews_get = [
 
 exports.interviews_post = [
   body('date', 'Date field should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('length').trim().isLength({ min: 1 }).escape(),
-  body('rate').trim().isLength({ min: 1 }).escape(),
   verifyToken,
   (req, res) => {
     const errors = validationResult(req);
@@ -52,14 +51,16 @@ exports.interviews_post = [
         if (tokenErr) {
           res.json({ err: tokenErr });
         } else {
+          const sanitizedLength = req.body.length;
+          const sanitizeRate = req.body.rate;
           const { user } = authData;
           const interview = new Interview({
             user: user._id,
             date: req.body.date,
             application: req.body.application,
-            length: req.body.length,
+            length: sanitizedLength,
             status: req.body.status,
-            rate: req.body.rate,
+            rate: sanitizeRate,
           });
           interview.save((err) => {
             if (err) {
