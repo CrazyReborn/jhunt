@@ -120,7 +120,7 @@ exports.interview_put = [
             if (err) {
               res.json({ err });
             } else {
-              res.send('success');
+              res.json({ msg: 'success' });
             }
           });
         }
@@ -141,7 +141,7 @@ exports.interview_delete = [
           if (savingErr) {
             res.json({ err: savingErr });
           } else {
-            res.send('success');
+            res.json({ msg: 'success' });
           }
         });
       }
