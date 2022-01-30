@@ -16,6 +16,7 @@ router.delete('/api/v1/applications/:id', applicationController.application_dele
 // Interview routes
 router.get('/api/v1/interviews', interviewController.interviews_get);
 router.post('/api/v1/interviews', interviewController.interviews_post);
+router.get('/api/v1/interviews/:id', interviewController.inteview_get);
 router.put('/api/v1/interviews/:id', interviewController.interview_put);
 router.delete('/api/v1/interviews/:id', interviewController.interview_delete);
 

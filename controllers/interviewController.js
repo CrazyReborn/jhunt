@@ -83,13 +83,9 @@ exports.inteview_get = [
       if (tokenErr) {
         res.json({ err: tokenErr });
       } else {
-        Interview.findBydId(req.params.id).populate('application').exec((err, interview) => {
-          if (err) {
-            res.json({ err });
-          } else {
-            res.json({ interview });
-          }
-        });
+        Interview.findById(req.params.id).populate('application')
+          .then((interview) => res.json({ interview }))
+          .catch((err) => res.json({ err }));
       }
     });
   },
