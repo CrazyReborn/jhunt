@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const { body, validationResult } = require('express-validator');
 const sanitizeHtml = require('sanitize-html');
 const jwt = require('jsonwebtoken');
@@ -92,8 +93,6 @@ exports.inteview_get = [
 ];
 
 exports.interview_put = [
-  body('length').trim().isLength({ min: 1 }).escape(),
-  body('rate').trim().isLength({ min: 1 }).escape(),
   verifyToken,
   (req, res) => {
     const errors = validationResult(req);
@@ -107,15 +106,14 @@ exports.interview_put = [
         } else {
           const { user } = authData;
           const interview = new Interview({
-            _id: user._id,
-            user: req.userId,
+            _id: req.params.id,
+            user: user._id,
             date: req.body.date,
             application: req.body.application,
             length: req.body.length,
             status: req.body.status,
             rate: req.body.rate,
           });
-
           Interview.findByIdAndUpdate(req.params.id, interview, (err) => {
             if (err) {
               res.json({ err });
