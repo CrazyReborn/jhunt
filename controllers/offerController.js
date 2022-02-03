@@ -35,32 +35,25 @@ exports.offers_get = [
   },
 ];
 
-// exports.event_new_get = [
-//   verifyToken,
-//   (req, res) => {
-//     async.parallel({
-//       applications(callback) {
-//         Application.find({ user: req.userId}).exec(callback);
-//       },
-//       interviews(callback) {
-//         Interview.find({ user: req.userId }).exec(callback);
-//       },
-//     }, (err, results) => {
-//       if (err) {
-//         res.json({ err });
-//       } else {
-//         const { cookies } = req;
-//         jwt.verify(cookies.token, 'secretKey', (tokenErr) => {
-//           if (tokenErr) {
-//             res.json({ err: tokenErr });
-//           } else {
-//             res.json({ applications: results.applications, interviews: results.interviews });
-//           }
-//         });
-//       }
-//     });
-//   },
-// ];
+exports.offer_new_get = [
+  verifyToken,
+  (req, res) => {
+    const { cookies } = req;
+    let user;
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
+      if (err) {
+        res.json({ err });
+      } else {
+        user = authData.user;
+      }
+    });
+    Interview.find({ user: user._id }).populate('application')
+      .then((interviews) => {
+        res.json({ interviews });
+      })
+      .catch((err) => res.json({ err }));
+  },
+];
 
 // exports.event_new_post = [
 //   verifyToken,
