@@ -3,6 +3,7 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const async = require('async');
+const Offer = require('../models/offer');
 const Application = require('../models/application');
 const Interviews = require('../models/interview');
 const User = require('../models/user');
@@ -35,9 +36,16 @@ exports.user_get = [
       interviews(callback) {
         Interviews.find({ user: user._id }, callback);
       },
+      offers(callback) {
+        Offer.find({ user: user._id }, callback);
+      },
     })
       .then((results) => {
-        res.json({ interviews: results.interviews, applications: results.applications });
+        res.json({
+          interviews: results.interviews,
+          applications: results.applications,
+          offers: results.offers,
+        });
       })
       .catch((err) => {
         res.json({ err });

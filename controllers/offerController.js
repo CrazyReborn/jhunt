@@ -74,6 +74,8 @@ exports.offer_new_post = [
       application: req.body.application,
     });
     offer.save()
+      .catch((err) => res.json({ err }));
+    Application.updateOne({ _id: req.body.application }, { $push: { offers: offer._id } })
       .then(() => res.json({ msg: 'success' }))
       .catch((err) => res.json({ err }));
   },
