@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const Application = require('../models/application');
@@ -44,35 +45,32 @@ exports.applications_post = [
       res.json({ err: errors });
     } else {
       const { cookies } = req;
+      let user;
       jwt.verify(cookies.token, 'secretKey', (err, authData) => {
         if (err) {
           res.json({ err });
         } else {
-          const { user } = authData;
-          const application = new Application({
-            user: user._id,
-            company_name: req.body.companyName,
-            position: req.body.position,
-            salary: req.body.salary,
-            status: req.body.status,
-            location: req.body.location,
-            aggregator: req.body.aggregator,
-            found_on: req.body.foundOn,
-            cv_sent_on: req.body.cvSentOn,
-            cv_path: req.body.cvPath,
-            job_link: req.body.jobLink,
-            answer_received: req.body.answerReceived,
-            qualifications_met: req.body.qualificationsMet,
-          });
-          application.save((savingErr) => {
-            if (savingErr) {
-              res.json({ err: savingErr });
-            } else {
-              res.json({ msg: 'success' });
-            }
-          });
+          user = authData.user;
         }
       });
+      const application = new Application({
+        user: user._id,
+        company_name: req.body.companyName,
+        position: req.body.position,
+        salary: req.body.salary,
+        status: req.body.status,
+        location: req.body.location,
+        aggregator: req.body.aggregator,
+        found_on: req.body.foundOn,
+        cv_sent_on: req.body.cvSentOn,
+        cv_path: req.body.cvPath,
+        job_link: req.body.jobLink,
+        answer_received: req.body.answerReceived,
+        qualifications_met: req.body.qualificationsMet,
+      });
+      application.save()
+        .then(() => res.json({ msg: 'success' }))
+        .catch((err) => res.json({ err }));
     }
   },
 ];
