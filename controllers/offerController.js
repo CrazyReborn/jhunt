@@ -104,22 +104,20 @@ exports.offer_put = [
   },
 ];
 
-// exports.event_delete = [
-//   verifyToken,
-//   (req, res) => {
-//     const { cookies } = req;
-//     jwt.verify(cookies.token, 'secretKey', (err) => {
-//       if (err) {
-//         res.json({ err });
-//       } else {
-//         Event.findByIdAndRemove(req.params.id, (deletingErr) => {
-//           if (deletingErr) {
-//             res.json({ err: deletingErr });
-//           } else {
-//             res.send('success');
-//           }
-//         });
-//       }
-//     });
-//   },
-// ];
+exports.offer_delete = [
+  verifyToken,
+  (req, res) => {
+    const { cookies } = req;
+    let user;
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
+      if (err) {
+        res.json({ err });
+      } else {
+        user = authData.user;
+      }
+    });
+    Offer.findByIdAndRemove(req.params.id)
+      .then(() => res.json({ msg: 'success' }))
+      .catch((err) => res.json({ err }));
+  },
+];

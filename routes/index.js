@@ -25,7 +25,7 @@ router.get('/api/v1/offers', offerController.offers_get);
 router.get('/api/v1/offers/new', offerController.offer_new_get);
 router.post('/api/v1/offers', offerController.offer_new_post);
 router.put('/api/v1/offers/:id', offerController.offer_put);
-// router.delete('/api/v1/offers/:id', offerController.event_delete);
+router.delete('/api/v1/offers/:id', offerController.offer_delete);
 
 // Sign Up and Sign In routes
 router.get('/api/v1/signin', userController.signin_get);
