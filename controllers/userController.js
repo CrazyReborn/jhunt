@@ -1,6 +1,10 @@
+/* eslint-disable no-underscore-dangle */
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const async = require('async');
+const Application = require('../models/application');
+const Interviews = require('../models/interview');
 const User = require('../models/user');
 
 const verifyToken = (req, res, next) => {
@@ -12,11 +16,34 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-exports.user_get = (req, res) => {
-  User.findById(req.params.id)
-    .then((user) => res.json({ user }))
-    .catch((err) => res.json({ err }));
-};
+exports.user_get = [
+  verifyToken,
+  (req, res) => {
+    const { cookies } = req;
+    let user = {};
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
+      if (err) {
+        res.json({ err });
+      } else {
+        user = authData.user;
+      }
+    });
+    async.parallel({
+      applications(callback) {
+        Application.find({ user: user._id }, callback);
+      },
+      interviews(callback) {
+        Interviews.find({ user: user._id }, callback);
+      },
+    })
+      .then((results) => {
+        res.json({ interviews: results.interviews, applications: results.applications });
+      })
+      .catch((err) => {
+        res.json({ err });
+      });
+  },
+];
 
 exports.signin_get = [
   verifyToken,
