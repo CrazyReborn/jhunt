@@ -55,60 +55,54 @@ exports.offer_new_get = [
   },
 ];
 
-// exports.event_new_post = [
-//   verifyToken,
-//   (req, res) => {
-//     const { cookies } = req;
-//     jwt.verify(cookies.token, 'secretKey', (err, authData) => {
-//       if (err) {
-//         res.json({ err });
-//       } else {
-//         const { user } = authData;
-//         const event = new Event({
-//           user: user._id,
-//           application: req.body.application,
-//           date: req.body.date,
-//           interview: req.body.interview,
-//         });
-//         event.save().exec((savingErr) => {
-//           if (savingErr) {
-//             res.json({ err: savingErr });
-//           } else {
-//             res.send('success');
-//           }
-//         });
-//       }
-//     });
-//   },
-// ];
+exports.offer_new_post = [
+  verifyToken,
+  (req, res) => {
+    const { cookies } = req;
+    let user;
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
+      if (err) {
+        res.json({ err });
+      } else {
+        user = authData.user;
+      }
+    });
+    const offer = new Offer({
+      user: user._id,
+      received: req.body.received,
+      interview: req.body.interview,
+      application: req.body.application,
+    });
+    offer.save()
+      .then(() => res.json({ msg: 'success' }))
+      .catch((err) => res.json({ err }));
+  },
+];
 
-// exports.event_put = [
-//   verifyToken,
-//   (req, res) => {
-//     const { cookies } = req;
-//     jwt.verify(cookies.token, 'secretKey', (err, authData) => {
-//       if (err) {
-//         res.json({ err });
-//       } else {
-//         const { user } = authData;
-//         const event = new Event({
-//           _id: req.params.id,
-//           user: user._id,
-//           application: req.body.application,
-//           date: req.body.date,
-//           interview: req.body.interview,
-//         });
-//         Event.findByIdAndUpdate(req.params, event, (updatingErr) => {
-//           if (updatingErr) {
-//             res.json({ err: updatingErr });
-//           } else {
-//             res.send('success');
-//           }
-//         });
-//       }
-//     });
-//   },
-// ];
+exports.offer_put = [
+  verifyToken,
+  (req, res) => {
+    const { cookies } = req;
+    let user;
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
+      if (err) {
+        res.json({ err });
+      } else {
+        user = authData.user;
+      }
+    });
+    const offer = new Offer({
+      _id: req.params.id,
+      user: user._id,
+      received: req.body.received,
+      interview: req.body.interview,
+      application: req.body.application,
+    });
+    Offer.findByIdAndUpdate(req.params.id, offer)
+      .then(() => res.json({ msg: 'success' }))
+      .catch((err) => res.json({ err }));
+  },
+];
 
 // exports.event_delete = [
 //   verifyToken,
