@@ -3,6 +3,7 @@ const { body, validationResult } = require('express-validator');
 const sanitizeHtml = require('sanitize-html');
 const jwt = require('jsonwebtoken');
 const Interview = require('../models/interview');
+const Application = require('../models/application');
 
 const verifyToken = (req, res, next) => {
   const { cookies } = req;
@@ -48,30 +49,29 @@ exports.interviews_post = [
       res.json({ err: errors });
     } else {
       const { cookies } = req;
+      let user;
+      const sanitizedLength = req.body.length;
+      const sanitizeRate = req.body.rate;
       jwt.verify(cookies.token, 'secretKey', (tokenErr, authData) => {
         if (tokenErr) {
           res.json({ err: tokenErr });
         } else {
-          const sanitizedLength = req.body.length;
-          const sanitizeRate = req.body.rate;
-          const { user } = authData;
-          const interview = new Interview({
-            user: user._id,
-            date: req.body.date,
-            application: req.body.application,
-            length: sanitizedLength,
-            status: req.body.status,
-            rate: sanitizeRate,
-          });
-          interview.save((err) => {
-            if (err) {
-              res.json({ err });
-            } else {
-              res.json({ msg: 'success' });
-            }
-          });
+          user = authData.user;
         }
       });
+      const interview = new Interview({
+        user: user._id,
+        date: req.body.date,
+        application: req.body.application,
+        length: sanitizedLength,
+        status: req.body.status,
+        rate: sanitizeRate,
+      });
+      interview.save()
+        .catch((err) => res.json({ err }));
+      Application.updateOne({ user: user._id }, { $push: { interviews: interview } })
+        .then(() => res.json({ msg: 'successs' }))
+        .catch((err) => res.json({ err }));
     }
   },
 ];
@@ -100,29 +100,26 @@ exports.interview_put = [
       res.json({ err: errors });
     } else {
       const { cookies } = req;
+      let user;
       jwt.verify(cookies.token, 'secretKey', (tokenErr, authData) => {
         if (tokenErr) {
           res.json({ err: tokenErr });
         } else {
-          const { user } = authData;
-          const interview = new Interview({
-            _id: req.params.id,
-            user: user._id,
-            date: req.body.date,
-            application: req.body.application,
-            length: req.body.length,
-            status: req.body.status,
-            rate: req.body.rate,
-          });
-          Interview.findByIdAndUpdate(req.params.id, interview, (err) => {
-            if (err) {
-              res.json({ err });
-            } else {
-              res.json({ msg: 'success' });
-            }
-          });
+          user = authData.user;
         }
       });
+      const interview = new Interview({
+        _id: req.params.id,
+        user: user._id,
+        date: req.body.date,
+        application: req.body.application,
+        length: req.body.length,
+        status: req.body.status,
+        rate: req.body.rate,
+      });
+      Interview.findByIdAndUpdate(req.params.id, interview)
+        .then(() => res.json({ msg: 'success' }))
+        .catch((err) => res.json({ err }));
     }
   },
 ];
@@ -131,18 +128,18 @@ exports.interview_delete = [
   verifyToken,
   (req, res) => {
     const { cookies } = req;
-    jwt.verify(cookies.token, 'secretKey', (err) => {
+    let user;
+    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
       if (err) {
         res.json({ err });
       } else {
-        Interview.findByIdAndRemove(req.params.id).exec((savingErr) => {
-          if (savingErr) {
-            res.json({ err: savingErr });
-          } else {
-            res.json({ msg: 'success' });
-          }
-        });
+        user = authData.user;
       }
     });
+    Interview.findByIdAndRemove(req.params.id)
+      .catch((err) => res.json({ err }));
+    Application.updateMany({ user: user._id }, { $pull: { interviews: req.params.id } })
+      .then(() => res.json({ msg: 'seccess' }))
+      .catch((err) => res.json({ err }));
   },
 ];
