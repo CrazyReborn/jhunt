@@ -60,13 +60,9 @@ exports.applications_post = [
         salary: req.body.salary,
         status: req.body.status,
         location: req.body.location,
-        aggregator: req.body.aggregator,
-        found_on: req.body.foundOn,
-        cv_sent_on: req.body.cvSentOn,
-        cv_path: req.body.cvPath,
-        job_link: req.body.jobLink,
-        answer_received: req.body.answerReceived,
         qualifications_met: req.body.qualificationsMet,
+        interviews: [],
+        offers: [],
       });
       application.save()
         .then(() => res.json({ msg: 'success' }))
@@ -106,13 +102,9 @@ exports.application_put = [
         salary: req.body.salary,
         status: req.body.status,
         location: req.body.location,
-        aggregator: req.body.aggregator,
-        found_on: req.body.foundOn,
-        cv_sent_on: req.body.cvSentOn,
-        cv_path: req.body.cvPath,
-        job_link: req.body.link,
-        answer_received: req.body.answerReceived,
         qualifications_met: req.body.qualifications,
+        interviews: [],
+        offers: [],
       });
       const { cookies } = req;
       jwt.verify(cookies.token, 'secretKey', (err) => {

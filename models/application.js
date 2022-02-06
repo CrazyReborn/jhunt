@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 const ApplicationSchema = new Schema({
   user: { type: String, required: true },
@@ -10,16 +10,17 @@ const ApplicationSchema = new Schema({
   status: {
     type: String,
     required: true,
-    enum: ['Application sent', 'No answer', 'Rejection', 'Upcoming interview', 'Offered'],
+    enum: [
+      'Application sent',
+      'No answer',
+      'No offer',
+      'Phone call',
+      'Interview',
+      'Offered',
+    ],
     default: 'Application sent',
   },
   location: { type: String },
-  aggregator: { type: String },
-  found_on: { type: Date },
-  cv_sent_on: { type: Date },
-  cv_path: { type: String },
-  job_link: { type: String },
-  answer_received: { type: Date },
   qualifications_met: {
     type: String,
     required: true,
