@@ -59,7 +59,7 @@ exports.signin_get = [
     const { cookies } = req;
     jwt.verify(cookies.token, 'secretKey', (err) => {
       if (err) {
-        res.json({ err });
+        res.json({ msg: err });
       } else {
         res.json({ msg: 'ok' });
       }

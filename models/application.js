@@ -20,6 +20,7 @@ const ApplicationSchema = new Schema({
     ],
     default: 'Application sent',
   },
+  date: { type: Date },
   location: { type: String },
   qualifications_met: {
     type: String,
