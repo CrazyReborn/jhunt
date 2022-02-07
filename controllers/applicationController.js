@@ -35,6 +35,7 @@ exports.applications_post = [
   body('position', 'Position should not be empty').trim().isLength({ min: 1 }).escape(),
   body('salary', 'Salary should not be empty').trim().isLength({ min: 1 }).escape(),
   body('location', 'Location should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('date', 'Date should not be empty'),
   body('jobLink', 'Link field should not be empty').trim().isLength({ min: 1 }),
   verifyToken,
   (req, res) => {
@@ -58,10 +59,10 @@ exports.applications_post = [
         position: req.body.position,
         salary: req.body.salary,
         status: req.body.status,
+        date: req.body.date,
+        jobLink: req.body.jobLink,
         location: req.body.location,
         qualifications_met: req.body.qualificationsMet,
-        interviews: [],
-        offers: [],
       });
       application.save()
         .then(() => res.json({ msg: 'success' }))
@@ -84,6 +85,7 @@ exports.application_put = [
   body('position', 'Position should not be empty').trim().isLength({ min: 1 }).escape(),
   body('salary', 'Salary should not be empty').trim().isLength({ min: 1 }).escape(),
   body('location', 'Location should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('date', 'Date should not be empty'),
   body('jobLink', 'Link field should not be empty').trim().isLength({ min: 1 }).escape(),
   verifyToken,
   (req, res) => {
@@ -102,22 +104,20 @@ exports.application_put = [
         jobLink: req.body.jobLink,
         date: req.body.date,
         location: req.body.location,
-        qualifications_met: req.body.qualifications,
-        interviews: [],
-        offers: [],
+        qualifications_met: req.body.qualificationsMet,
       });
       const { cookies } = req;
       jwt.verify(cookies.token, 'secretKey', (err) => {
         if (err) {
           res.json({ err });
         } else {
-          Application.findByIdAndUpdate(req.params.id, application, (savingErr) => {
-            if (savingErr) {
-              res.json({ err: savingErr });
-            } else {
+          Application.findByIdAndUpdate(req.params.id, application)
+            .then(() => {
               res.json({ msg: 'succsess' });
-            }
-          });
+            })
+            .catch((saveErr) => {
+              res.json({ err: saveErr });
+            });
         }
       });
     }

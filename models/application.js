@@ -29,8 +29,6 @@ const ApplicationSchema = new Schema({
     enum: ['Fully met', 'Mostly met', 'Half are met', 'Mostly unmet', 'Fully unmet'],
     default: 'Half are met',
   },
-  interviews: [{ type: Schema.Types.ObjectId, ref: 'Application' }],
-  offers: [{ type: Schema.Types.ObjectId, ref: 'Offer' }],
 });
 
 module.exports = mongoose.model('Application', ApplicationSchema);
