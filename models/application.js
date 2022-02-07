@@ -21,6 +21,7 @@ const ApplicationSchema = new Schema({
     default: 'Application sent',
   },
   date: { type: Date },
+  jobLink: { type: String },
   location: { type: String },
   qualifications_met: {
     type: String,

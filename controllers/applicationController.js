@@ -35,7 +35,6 @@ exports.applications_post = [
   body('position', 'Position should not be empty').trim().isLength({ min: 1 }).escape(),
   body('salary', 'Salary should not be empty').trim().isLength({ min: 1 }).escape(),
   body('location', 'Location should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('aggregator', 'Aggregator field should not be empty').trim().isLength({ min: 1 }).escape(),
   body('jobLink', 'Link field should not be empty').trim().isLength({ min: 1 }),
   verifyToken,
   (req, res) => {
@@ -85,7 +84,6 @@ exports.application_put = [
   body('position', 'Position should not be empty').trim().isLength({ min: 1 }).escape(),
   body('salary', 'Salary should not be empty').trim().isLength({ min: 1 }).escape(),
   body('location', 'Location should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('aggregator', 'Aggregator field should not be empty').trim().isLength({ min: 1 }).escape(),
   body('jobLink', 'Link field should not be empty').trim().isLength({ min: 1 }).escape(),
   verifyToken,
   (req, res) => {
@@ -101,6 +99,8 @@ exports.application_put = [
         position: req.body.position,
         salary: req.body.salary,
         status: req.body.status,
+        jobLink: req.body.jobLink,
+        date: req.body.date,
         location: req.body.location,
         qualifications_met: req.body.qualifications,
         interviews: [],
