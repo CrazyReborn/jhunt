@@ -124,6 +124,7 @@ exports.signup_post = [
           const user = new User({
             username: req.body.username,
             password: hashedPassword,
+            joined: Date.now(),
           });
           user.save((savingErr) => {
             if (err) {
