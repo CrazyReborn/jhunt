@@ -70,7 +70,7 @@ exports.signin_get = [
 // signin_post here
 exports.signin_post = [
   body('username', 'Username field should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('password', 'Password field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('password', 'Password field should not be empty').isLength({ min: 1 }).escape(),
   (req, res) => {
     const errors = validationResult(req);
 
@@ -81,16 +81,48 @@ exports.signin_post = [
         if (err) {
           res.json({ err });
         } else if (user === null) {
-          res.json({ err: 'Wrong username' });
+          const userErr = [{
+            value: '',
+            msg: 'Username not found',
+            param: 'username',
+            location: 'body',
+          }];
+          res.json({ err: { errors: userErr } });
         } else {
-          bcrypt.compare(req.body.password, user.password)
-            .then(() => {
+          bcrypt.compare(req.body.password, user.password, (compareErr, result) => {
+            if (result) {
               const token = jwt.sign({ user }, 'secretKey');
               res.cookie('token', token, {
                 httpOnly: true,
+                expires: 0,
               }).json({ msg: 'success' });
-            })
-            .catch(() => res.json({ err: 'Wrong password' }));
+            } else {
+              const passwordErr = [{
+                value: '',
+                msg: 'Wrong password',
+                param: 'password',
+                location: 'body',
+              }];
+              res.json({ err: { errors: passwordErr } });
+            }
+          });
+          // bcrypt.compare(req.body.password, user.password)
+          //   .then(() => {
+          //     const token = jwt.sign({ user }, 'secretKey');
+          //     res.cookie('token', token, {
+          //       httpOnly: true,
+          //       expires: now.getTime() + (3600 * 1000),
+          //     }).json({ msg: 'success' });
+          //   })
+          //   .catch(() => {
+          //     const passwordErr = [{
+          //       value: '',
+          //       msg: 'Wrong password',
+          //       param: 'password',
+          //       location: 'body',
+          //     }];
+          //     res.json({ err: { errors: passwordErr } });
+          //   });
         }
       });
     }
@@ -103,7 +135,7 @@ exports.signup_get = (req, res) => {
 
 exports.signup_post = [
   body('username', 'Username field should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('password', 'Password field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('password', 'Password field should not be empty').isLength({ min: 1 }).escape(),
   body('confirmPassword', 'Confirm password field should not be empty').trim().isLength({ min: 1 }).escape()
     .custom((value, { req }) => {
       if (value !== req.body.password) {
