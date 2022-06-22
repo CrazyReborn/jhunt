@@ -106,23 +106,6 @@ exports.signin_post = [
               res.json({ err: { errors: passwordErr } });
             }
           });
-          // bcrypt.compare(req.body.password, user.password)
-          //   .then(() => {
-          //     const token = jwt.sign({ user }, 'secretKey');
-          //     res.cookie('token', token, {
-          //       httpOnly: true,
-          //       expires: now.getTime() + (3600 * 1000),
-          //     }).json({ msg: 'success' });
-          //   })
-          //   .catch(() => {
-          //     const passwordErr = [{
-          //       value: '',
-          //       msg: 'Wrong password',
-          //       param: 'password',
-          //       location: 'body',
-          //     }];
-          //     res.json({ err: { errors: passwordErr } });
-          //   });
         }
       });
     }
@@ -149,20 +132,32 @@ exports.signup_post = [
     if (!errors.isEmpty()) {
       res.json({ err: errors });
     } else {
-      bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
-        if (err) {
-          res.json({ err });
+      User.findOne({ username: req.body.username }, (err, existingUser) => {
+        if (existingUser != null) {
+          const duplicateErr = [{
+            value: '',
+            msg: 'This username already exists.',
+            param: 'username',
+            location: 'body',
+          }];
+          res.json({ err: { errors: duplicateErr } });
         } else {
-          const user = new User({
-            username: req.body.username,
-            password: hashedPassword,
-            joined: Date.now(),
-          });
-          user.save((savingErr) => {
+          bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
             if (err) {
-              res.json({ err: savingErr });
+              res.json({ err });
             } else {
-              res.json({ msg: 'success' });
+              const user = new User({
+                username: req.body.username,
+                password: hashedPassword,
+                joined: Date.now(),
+              });
+              user.save((savingErr) => {
+                if (err) {
+                  res.json({ err: savingErr });
+                } else {
+                  res.json({ msg: 'success' });
+                }
+              });
             }
           });
         }
