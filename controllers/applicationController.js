@@ -16,14 +16,21 @@ exports.applications_get = [
   verifyToken,
   (req, res) => {
     const { cookies } = req;
-    jwt.verify(cookies.token, 'secretKey', (err, authData) => {
-      if (err) {
-        res.json({ err });
+    jwt.verify(cookies.token, 'secretKey', (errors, authData) => {
+      if (errors) {
+        res.json({ err: [errors] });
       } else {
         const { user } = authData;
+        let averages = {};
+        Application.aggregate([{ $match: { user: user._id } }, { $group: { _id: null, avg: { $avg: '$salary' } } }])
+          .then((found) => {
+            averages = found;
+            return null;
+          })
+          .catch((userErr) => console.log(userErr));
         Application.find({ user: user._id })
-          .then((applications) => res.json({ applications }))
-          .catch((userErr) => res.json({ err: userErr }));
+          .then((applications) => res.json({ applications, averages }))
+          .catch((userErr) => res.json({ err: [userErr] }));
       }
     });
   },
@@ -31,11 +38,11 @@ exports.applications_get = [
 
 exports.applications_post = [
   //  Maybe exclude validation and leave only sanitization;
-  body('companyName', 'Company name should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('position', 'Position should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('salary', 'Salary should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('location', 'Location should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('date', 'Date should not be empty'),
+  body('companyName', 'Company name field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('position', 'Position should field not be empty').trim().isLength({ min: 1 }).escape(),
+  body('salary', 'Salary field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('location', 'Location field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('date', 'Date field should not be empty'),
   body('jobLink', 'Link field should not be empty').trim().isLength({ min: 1 }),
   verifyToken,
   (req, res) => {
@@ -81,11 +88,11 @@ exports.application_get = [
 ];
 
 exports.application_put = [
-  body('companyName', 'Company name should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('position', 'Position should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('salary', 'Salary should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('location', 'Location should not be empty').trim().isLength({ min: 1 }).escape(),
-  body('date', 'Date should not be empty'),
+  body('companyName', 'Company field name should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('position', 'Position field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('salary', 'Salary field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('location', 'Location field should not be empty').trim().isLength({ min: 1 }).escape(),
+  body('date', 'Date field should not be empty'),
   body('jobLink', 'Link field should not be empty').trim().isLength({ min: 1 }).escape(),
   verifyToken,
   (req, res) => {
@@ -107,9 +114,9 @@ exports.application_put = [
         qualifications_met: req.body.qualificationsMet,
       });
       const { cookies } = req;
-      jwt.verify(cookies.token, 'secretKey', (err) => {
-        if (err) {
-          res.json({ err });
+      jwt.verify(cookies.token, 'secretKey', (jwterr) => {
+        if (jwterr) {
+          res.json({ err: [jwterr] });
         } else {
           Application.findByIdAndUpdate(req.params.id, application)
             .then(() => {
@@ -128,9 +135,9 @@ exports.application_delete = [
   verifyToken,
   (req, res) => {
     const { cookies } = req;
-    jwt.verify(cookies.token, 'secretKey', (err) => {
-      if (err) {
-        res.json({ err });
+    jwt.verify(cookies.token, 'secretKey', (errors) => {
+      if (errors) {
+        res.json({ err: errors });
       } else {
         Application.findByIdAndRemove(req.params.id)
           .then(() => res.json({ msg: 'success' }))

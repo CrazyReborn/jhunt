@@ -132,7 +132,10 @@ exports.signup_post = [
     if (!errors.isEmpty()) {
       res.json({ err: errors });
     } else {
-      User.findOne({ username: req.body.username }, (err, existingUser) => {
+      User.findOne({ username: req.body.username }, (errorExUs, existingUser) => {
+        if (errorExUs) {
+          res.json({ err: errorExUs });
+        }
         if (existingUser != null) {
           const duplicateErr = [{
             value: '',
