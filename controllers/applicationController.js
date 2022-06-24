@@ -21,15 +21,15 @@ exports.applications_get = [
         res.json({ err: [errors] });
       } else {
         const { user } = authData;
-        let averages = {};
-        Application.aggregate([{ $match: { user: user._id } }, { $group: { _id: null, avg: { $avg: '$salary' } } }])
+        let averagesAll = {};
+        Application.aggregate([{ $group: { _id: null, avg: { $avg: '$salary' } } }])
           .then((found) => {
-            averages = found;
+            averagesAll = found;
             return null;
           })
           .catch((userErr) => console.log(userErr));
         Application.find({ user: user._id })
-          .then((applications) => res.json({ applications, averages }))
+          .then((applications) => res.json({ applications, averagesAll }))
           .catch((userErr) => res.json({ err: [userErr] }));
       }
     });
