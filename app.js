@@ -10,7 +10,7 @@ require('dotenv').config();
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
-const PORT = process.env.PORT || 5000;
+const PORT = 8080;
 
 const app = express();
 
@@ -40,5 +40,5 @@ app.get('/', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged In' : 'Logged Out');
 });
 
-app.listen(PORT);
+app.listen(PORT, '0.0.0.0');
 module.exports = app;
