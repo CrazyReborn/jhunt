@@ -40,5 +40,8 @@ app.get('/', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged In' : 'Logged Out');
 });
 
-app.listen(PORT);
+app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
+  console.log('App listening on port ', PORT);
+});
 module.exports = app;
