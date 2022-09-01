@@ -36,12 +36,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+const setCache = function (req, res, next) {
+  const period = 60 * 5;
+  if (req.method === 'GET') {
+    res.set('Cache-control', `public, max-age=${period}`)
+  } else {
+    res.set('Cache-control', 'no-store');
+  }
+  next();
+};
+
+app.use(setCache);
+
 app.get('/', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged In' : 'Logged Out');
 });
 
+
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
+  console.log(process.env.CLIENT_SERVER);
   console.log('App listening on port ', PORT);
 });
 module.exports = app;
